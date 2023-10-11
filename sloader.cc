@@ -19,6 +19,7 @@
 #include "dyn_loader.h"
 #include "exec_loader.h"
 #include "utils.h"
+#include <sqlite3.h>
 
 Elf64_Half GetEType(const std::filesystem::path& filepath) {
     int fd = open(filepath.c_str(), O_RDONLY);
@@ -67,6 +68,9 @@ int main(int argc, char* const argv[], char** envp) {
     for (char** env = envp; *env != 0; env++) {
         envs.emplace_back(*env);
     }
+
+    sqlite3 *db;
+    sqlite3_open(":memory:", &db);
 
     Elf64_Half etype = GetEType(fullpath);
     if (etype == ET_DYN || etype == ET_EXEC) {

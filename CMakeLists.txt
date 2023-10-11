@@ -11,6 +11,9 @@ set(CUSTOM_LIBC_PATH CACHE PATH "")
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+find_package (SQLite3 REQUIRED)
+include_directories(${SQLite3_INCLUDE_DIRS})
+
 include(third-party)
 get_third_party(glog)
 set(WITH_GFLAGS
@@ -29,9 +32,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/raw_write)
 add_library(tls_secure tls_secure.cc)
 
 add_executable(sloader sloader.cc dyn_loader.cc libc_mapping.cc sloader_dl.cc utils.cc sloader_static.map)
-target_link_libraries(sloader glog tls_secure)
+target_link_libraries(sloader glog tls_secure SQLite::SQLite3)
 target_compile_options(sloader PUBLIC -Wall -Werror)
-target_link_options(sloader PUBLIC -static -Wl,-verbose -T ${CMAKE_CURRENT_SOURCE_DIR}/sloader_static.map)
+target_link_options(sloader PUBLIC -Wl,-verbose -T ${CMAKE_CURRENT_SOURCE_DIR}/sloader_static.map)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.cmake
                ${CMAKE_CURRENT_BINARY_DIR})
